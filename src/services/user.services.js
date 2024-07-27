@@ -1,6 +1,5 @@
 const bcrypt = require('bcrypt');
 const nodemailer = require("nodemailer");
-
 require('dotenv').config();
 
 function hashString(string) {

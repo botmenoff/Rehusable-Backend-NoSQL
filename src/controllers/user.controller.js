@@ -1,5 +1,6 @@
 const User = require('../models/user.model');
 const userService = require('../services/user.services')
+const jwt = require('jsonwebtoken')
 
 // GETALL
 const getAllUsers = async (req, res) => {
@@ -18,7 +19,6 @@ const register = async (req, res) => {
         const user = req.body;
 
         // Username
-        console.log(user);
         const existingUser = await User.findOne({ userName: user.userName });
         if (existingUser) {
             res.status(400).json({ Error: "This userName has allready been registred" });
@@ -36,7 +36,7 @@ const register = async (req, res) => {
         const insertedUser = await User.create({userName: user.userName, email: user.email, password: hashedPassword, isBanned: false, verifiedEmail: false, isAdmin: false})
 
         // Enviar email de verificacion
-        // verificationEmail()
+        sendVerificationEmail(user)
 
         // Respuesta
         res.status(201).json({
@@ -51,18 +51,17 @@ const register = async (req, res) => {
     }
 }
 
-
 // EMAILS
 
 // SENDEMAIL
-const sendVerificationEmail = async (req, res, next) => {
+const sendVerificationEmail = async (user) => {
     try {
         // Endpoint URL
         const endpointUrl = 'http://127.0.0.1:3000/api/user/verify/';
 
         // Payload
         const tokenPayload = {
-            email: req.body.email
+            email: user.email
         }
         // Generar un json web token
         const token = jwt.sign(tokenPayload, process.env.SECRET_KEY, { expiresIn: '24h' })
@@ -71,12 +70,12 @@ const sendVerificationEmail = async (req, res, next) => {
 
         // Enviar email
         // Import the transporter object
-        const { transporter } = require('../services/Services.js');
+        const { transporter } = require('../services/user.services.js');
         async function main() {
             // send mail with defined transport object
             const info = await transporter.sendMail({
-                from: 'diamondbet@zohomail.eu',
-                to: req.body.email,
+                from: 'Suppot team',
+                to: user.email,
                 subject: "Verification Email",
                 html: `
             <p>Clica el boton para verificar tu cuenta </p>
@@ -92,7 +91,6 @@ const sendVerificationEmail = async (req, res, next) => {
         }
 
         await main();
-        next();
     } catch (error) {
         console.error("Error sending verification email:", error);
         res.status(500).json({ 'Unexpected Error:': error.message });
