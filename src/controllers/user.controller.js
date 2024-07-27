@@ -10,6 +10,16 @@ const getAllUsers = async (req, res) => {
     }
 };
 
+// Register
+const register = (req, res) => {
+    try {
+        res.status(200).json("BUENAS");
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+}
+
 module.exports = {
-    getAllUsers
+    getAllUsers,
+    register
 };

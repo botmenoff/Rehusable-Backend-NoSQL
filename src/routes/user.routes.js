@@ -3,9 +3,11 @@ const express = require('express');
 const router = express.Router();
 
 // Archivos
-const UserController = require('../controllers/user.controller.js')
+const UserController = require('../controllers/user.controller')
+const UserMiddlewares = require('../middlewares/user.middlewares')
 
 // Rutas
-router.get('/user/get', UserController.getAll);
+router.post('/user/register', UserMiddlewares.registerMiddleware, UserController.register);
+
 
 module.exports = router;
