@@ -6,8 +6,9 @@ const userSchema = new Schema({
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
   isBanned: { type: Boolean, default: false },
-  verifiedEmail: { type: Boolean, default: false }
+  verifiedEmail: { type: Boolean, default: false },
+  isAdmin: { type: Boolean, default: false }
 });
 
-const User = mongoose.model('User', userSchema);
+const User = mongoose.model('Users', userSchema);
 module.exports = User;

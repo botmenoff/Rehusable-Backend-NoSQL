@@ -9,7 +9,7 @@ const registerMiddleware = (req, res, next) => {
                 .max(30)
                 .required(),
             email: Joi.string()
-                .email()    
+                .email()
                 .required(),
             password: Joi.string()
                 /*
@@ -22,17 +22,44 @@ const registerMiddleware = (req, res, next) => {
                 .required(),
             passwordConf: Joi.ref('password')
         });
-    
-        // Definimos el usuario que nos pasan de la ruta
-        const user = req.body;
+
         // Definimos el error
-        const { error } = UserSchema.validate(user);
-        // Si los datos son correctos pasamos a la ruta
+        const user = req.body;
+        const { error } = userSchema.validate(user);
+
         if (error) {
-            res.status(400).json({ 'Bad request': error.details });
+            // Create a custom response for each validation error
+            const customErrors = error.details.map(detail => {
+                let customMessage = 'Error en el campo ' + detail.context.label;
+                switch (detail.context.key) {
+                    case 'email':
+                        customMessage = 'Error: Email field is incorrect';
+                        break;
+                    case 'password':
+                        customMessage = 'Error: Password field is incorrect remember it has to have 1 mayus 1 number, 1 special character and 8 digits';
+                        break;
+                    case 'userName':
+                        customMessage = 'Error: Username has to have minimum 3  characters and maximum 30 and no strange characters';
+                        break;
+
+                    case 'passwordConf':
+                        customMessage = 'Error: It has to match the password';
+                        break;
+                    // Add cases for other fields
+                    default:
+                        customMessage = 'Error en el campo ' + detail.context.label;
+                }
+                return {
+                    message: customMessage,
+                    path: detail.path,
+                };
+            });
+
+            res.status(400).json({ 'Bad request': customErrors });
         } else {
             next();
         }
+
     } catch (error) {
         res.status(500).json({ 'Revise your user': error.details });
     }
