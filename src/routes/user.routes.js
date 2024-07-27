@@ -8,6 +8,7 @@ const UserMiddlewares = require('../middlewares/user.middlewares')
 
 // Rutas
 router.post('/user/register', UserMiddlewares.registerMiddleware, UserController.register);
+router.get('/user/verify/:jwt', UserController.verifyEmail);
 
 
 module.exports = router;

@@ -11,7 +11,7 @@ const getAllUsers = async (req, res) => {
     }
 };
 
-// Register
+// REGISTER
 const register = async (req, res) => {
     try {
         // Verificar que el usuario y el email no estan ya registrados
@@ -51,7 +51,11 @@ const register = async (req, res) => {
     }
 }
 
-const verificationEmail = async (req, res, next) => {
+
+// EMAILS
+
+// SENDEMAIL
+const sendVerificationEmail = async (req, res, next) => {
     try {
         // Endpoint URL
         const endpointUrl = 'http://127.0.0.1:3000/api/user/verify/';
@@ -95,7 +99,42 @@ const verificationEmail = async (req, res, next) => {
     }
 }
 
+// EMAIL ENDPOINT
+const verifyEmail = async (req, res) => {
+    try {
+        const token = req.params.jwt
+        console.log(jwt);
+
+        // Verificar el token
+        jwt.verify(token, process.env.SECRET_KEY, async (err, decoded) => {
+            if (err) {
+                res.status(500).json({ message: "Error decodifying" })
+            } else {
+                // Hacer una query para obtener el usuario
+                const userEmail = decoded.email
+                console.log(userEmail);
+                // Buscar el usuario
+                const user = await User.findOne({ email: userEmail });
+                // Si no lo encuentra
+                if (!user) {
+                    return res.status(404).json({ message: "Usuario no encontrado" });
+                } else {
+                    // Hacer la consulta
+                    const updatedUser = await User.updateOne({ verifiedEmail: true });
+                }
+                res.status(200).json({ message: "Email verificado exitosamente" });
+            }
+        })
+
+    } catch (error) {
+        if (!res.headersSent) {
+            res.status(500).json({ message: error.message });
+        }
+    }
+}
+
 module.exports = {
     getAllUsers,
-    register
+    register,
+    verifyEmail
 };
