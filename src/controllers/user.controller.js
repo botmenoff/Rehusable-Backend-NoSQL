@@ -1,6 +1,8 @@
 const User = require('../models/user.model');
 const userService = require('../services/user.services')
 const jwt = require('jsonwebtoken')
+const bcrypt = require('bcrypt')
+require('dotenv').config(); // Cargar las variables de entorno
 
 // GETALL
 const getAllUsers = async (req, res) => {
@@ -31,12 +33,12 @@ const register = async (req, res) => {
         }
 
         // Hashear password
-        const hashedPassword = userService.hashString(user.password)
+        const hashedPassword = await userService.hashString(user.password)
         // Insertar usuario
-        const insertedUser = await User.create({userName: user.userName, email: user.email, password: hashedPassword, isBanned: false, verifiedEmail: false, isAdmin: false})
+        const insertedUser = await User.create({ userName: user.userName, email: user.email, password: hashedPassword, isBanned: false, verifiedEmail: false, isAdmin: false })
 
         // Enviar email de verificacion
-        sendVerificationEmail(user)
+        // sendVerificationEmail(user)
 
         // Respuesta
         res.status(201).json({
@@ -50,6 +52,33 @@ const register = async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 }
+
+// LOGIN
+const login = async (req, res) => {
+    try {
+        const credentials = req.body
+
+        // Search user 
+        const userFound = await User.findOne({email: credentials.email})
+        if (!userFound) {
+            res.status(500).json({ message: "User not found" });
+        }
+
+        // Verificar contraseña
+        const validPAssword = await bcrypt.compare(credentials.password, userFound.password)
+        if (!validPAssword) {
+            return res.status(401).json({ message: "Incorrect Password" });
+        }
+
+        // Generar el jwt
+        const token = await jwt.sign({id: userFound.id}, process.env.SECRET_KEY,  {expiresIn: 60 * 60 * 24})
+        res.status(200).json({ message: token });
+
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+}
+
 
 // EMAILS
 
@@ -134,5 +163,6 @@ const verifyEmail = async (req, res) => {
 module.exports = {
     getAllUsers,
     register,
-    verifyEmail
+    verifyEmail,
+    login
 };
