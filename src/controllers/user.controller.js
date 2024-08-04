@@ -35,7 +35,7 @@ const register = async (req, res) => {
         // Hashear password
         const hashedPassword = await userService.hashString(user.password)
         // Insertar usuario
-        const insertedUser = await User.create({ userName: user.userName, email: user.email, password: hashedPassword, isBanned: false, verifiedEmail: false, isAdmin: false })
+        const insertedUser = await User.create({ userName: user.userName, email: user.email, avatar: "https://ui-avatars.com/api/?name=" + user.userName + "&background=0D8ABC&color=fff&size=128", password: hashedPassword, isBanned: false, verifiedEmail: false, isAdmin: false })
 
         // Enviar email de verificacion
         // sendVerificationEmail(user)
