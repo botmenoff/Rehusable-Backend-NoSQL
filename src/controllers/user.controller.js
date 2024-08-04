@@ -242,7 +242,7 @@ module.exports = {
     register,
     verifyEmail,
     login,
-    getUserById
+    getUserById,
     updateUser,
     deleteUsersById
 };
