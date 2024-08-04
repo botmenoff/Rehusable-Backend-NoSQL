@@ -59,7 +59,7 @@ const login = async (req, res) => {
         const credentials = req.body
 
         // Search user 
-        const userFound = await User.findOne({email: credentials.email})
+        const userFound = await User.findOne({ email: credentials.email })
         if (!userFound) {
             res.status(500).json({ message: "User not found" });
         }
@@ -71,7 +71,7 @@ const login = async (req, res) => {
         }
 
         // Generar el jwt
-        const token = await jwt.sign({id: userFound.id}, process.env.SECRET_KEY,  {expiresIn: 60 * 60 * 24})
+        const token = await jwt.sign({ id: userFound.id }, process.env.SECRET_KEY, { expiresIn: 60 * 60 * 24 })
         res.status(200).json({ message: token });
 
     } catch (error) {
@@ -175,6 +175,66 @@ const getUserById = async (req, res) => {
             res.status(500).json({ message: error.message });
         }
     }
+}      
+
+// UPDATE USER 
+const updateUser = async (req, res) => {
+    try {
+        const userId = req.params.id;
+
+        // Buscar el usuario
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).json({ message: "Usuario no encontrado" });
+        }
+
+        // Preparar el userInput
+        const userInput = {};
+
+        // Si el campo de userName está relleno, le añadimos el campo correspondiente y generamos el avatar
+        if (req.body.userName) {
+            userInput.userName = req.body.userName;
+            userInput.avatar = "https://ui-avatars.com/api/?name=" + req.body.userName + "&background=0D8ABC&color=fff&size=128";
+        }
+
+        // Si el campo de email está relleno, le añadimos el campo correspondiente
+        if (req.body.email) {
+            userInput.email = req.body.email;
+        }
+
+        // Comprobamos que haya campos para hacer el update
+        if (Object.keys(userInput).length > 0) {
+            try {
+                const updatedUser = await User.findByIdAndUpdate(userId, userInput, { new: true });
+                return res.status(200).json({ message: "User updated successfully", user: updatedUser });
+            } catch (error) {
+                return res.status(500).json({ message: "Error updating user", error: error.message });
+            }
+        } else {
+            return res.status(400).json({ message: "No fields provided for update" });
+        }
+    } catch (error) {
+        if (!res.headersSent) {
+            res.status(500).json({ message: error.message });
+        }
+    }
+}
+
+// DELETE BY ID
+const deleteUsersById = async (req, res) => {
+    try {
+        const userId = req.params.id;
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).json({ message: "Uer not found" });
+        }
+        await user.deleteOne();
+        res.status(200).json({ message: "User deleted" });
+    } catch (error) {
+        if (!res.headersSent) {
+            res.status(500).json({ message: error.message });
+        }
+    }
 }
 
 module.exports = {
@@ -183,4 +243,6 @@ module.exports = {
     verifyEmail,
     login,
     getUserById
+    updateUser,
+    deleteUsersById
 };
