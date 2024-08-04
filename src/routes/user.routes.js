@@ -10,8 +10,8 @@ const UserMiddlewares = require('../middlewares/user.middlewares')
 router.post('/user/register', UserMiddlewares.registerMiddleware, UserController.register);
 router.get('/user/verify/:jwt', UserController.verifyEmail);
 router.get('/user/login', UserController.login);
+router.get('/user/get/:id', UserController.getUserById)
 router.put('/user/update/:id', UserController.updateUser)
 router.delete('/user/delete/:id', UserMiddlewares.verifyOwner, UserController.deleteUsersById);
-
 
 module.exports = router;

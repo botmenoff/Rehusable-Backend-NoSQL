@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+
 const Schema = mongoose.Schema;
 
 const userSchema = new Schema({
@@ -9,7 +10,7 @@ const userSchema = new Schema({
   isBanned: { type: Boolean, default: false },
   verifiedEmail: { type: Boolean, default: false },
   isAdmin: { type: Boolean, default: false }
-});
+}, { timestamps: true });
 
 const User = mongoose.model('Users', userSchema);
 module.exports = User;
