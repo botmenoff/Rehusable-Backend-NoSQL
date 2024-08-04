@@ -164,9 +164,7 @@ const verifyEmail = async (req, res) => {
 const getUserById = async (req, res) => {
     try {
         const userId = req.params.id;
-        const user = await User.findById(userId, {
-            attributes: ['userName', 'email', 'isAdmin', 'isBanned', 'avatar'],
-        });
+        const user = await User.findById(userId).select('userName email avatar isBanned verifiedEmail isAdmin createdAt updatedAt');
         if (!user) {
             return res.status(404).json({ message: "User not found" });
         } else {
@@ -183,5 +181,6 @@ module.exports = {
     getAllUsers,
     register,
     verifyEmail,
-    login
+    login,
+    getUserById
 };
