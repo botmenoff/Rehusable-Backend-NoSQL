@@ -203,10 +203,29 @@ const updateUser = async (req, res) => {
     }
 }
 
+// DELETE BY ID
+const deleteUsersById = async (req, res) => {
+    try {
+        const userId = req.params.id;
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).json({ message: "Usuario no encontrado" });
+        }
+        await user.deleteOne();
+        res.status(200).json({ message: "Usuario eliminado exitosamente" });
+    } catch (error) {
+        if (!res.headersSent) {
+            res.status(500).json({ message: error.message });
+        }
+    }
+}
+
+
 module.exports = {
     getAllUsers,
     register,
     verifyEmail,
     login,
-    updateUser
+    updateUser,
+    deleteUsersById
 };
