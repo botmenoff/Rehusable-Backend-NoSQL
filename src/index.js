@@ -8,17 +8,13 @@ const port = process.env.PORT || 4000;
 // Añadir middleware para que Express pueda procesar JSON
 app.use(express.json());
 
-// Hacer la conexion con mongoDB
-// mongoConnection.run()
 
 // Importar las rutas
-// const UserRoutes = require('./routes/User.routes.js');
+const UserRoutes = require('./routes/user.routes.js');
 
 // Usar las rutas
-// const userRoutesPrefix = '/api';
-// app.use(userRoutesPrefix, UserRoutes);
-
-// Connectarse con la BBDD
+const userRoutesPrefix = '/api';
+app.use(userRoutesPrefix, UserRoutes);
 
 // Empezar el servidor
 app.listen(port, () => {
